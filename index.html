@@ -47,7 +47,7 @@ body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--g
 .scenario-card:hover { border-color:var(--blue-mid); transform:translateY(-2px); box-shadow:0 4px 14px rgba(46,109,164,0.15); }
 .scenario-card.active { border-color:var(--blue-mid); box-shadow:0 4px 16px rgba(46,109,164,0.25); }
 .scenario-emoji-box { height:80px; display:flex; align-items:center; justify-content:center; font-size:36px; background:var(--blue-pale); transition:background 0.2s; overflow:hidden; position:relative; }
-.scenario-emoji-box img { width:100%; height:100%; object-fit:cover; position:absolute; inset:0; }
+.scenario-emoji-box img { width:100%; height:100%; object-fit:cover; }
 .scenario-card-body { padding:10px 12px 12px; }
 .scenario-card-name { font-size:13px; font-weight:600; color:var(--blue-deep); margin-bottom:3px; }
 .scenario-card-desc { font-size:11px; color:var(--grey-mid); line-height:1.4; font-weight:300; }
@@ -60,7 +60,8 @@ body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--g
 @keyframes fadeSlide { from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);} }
 .problem-inner { display:grid; grid-template-columns:200px 1fr; gap:22px; align-items:start; }
 .problem-image-box { background:var(--white); border:1.5px solid var(--blue-soft); border-radius:10px; height:180px; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; overflow:hidden; }
-.problem-big-emoji { font-size:72px; line-height:1; }
+.problem-big-emoji { font-size:72px; line-height:1; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
+.problem-big-emoji img { width: 100%; height: 100%; object-fit: cover; }
 .problem-scene { position:absolute; bottom:0; left:0; right:0; background:rgba(30,58,95,0.82); color:white; font-size:10px; text-align:center; padding:6px; font-weight:500; letter-spacing:0.5px; z-index:1; }
 .problem-details { display:flex; flex-direction:column; gap:12px; }
 .problem-title { font-family:'Fraunces',serif; font-size:18px; font-weight:700; color:var(--blue-deep); line-height:1.2; }
@@ -68,9 +69,6 @@ body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--g
 .detail-key { font-size:9.5px; letter-spacing:2px; text-transform:uppercase; color:var(--blue-mid); font-weight:600; }
 .detail-val { font-size:13.5px; color:var(--grey-dark); line-height:1.5; font-weight:300; }
 .recipient-pill { display:inline-flex; align-items:center; gap:7px; background:var(--blue-deep); color:white; border-radius:20px; padding:6px 14px; font-size:12.5px; font-weight:500; width:fit-content; margin-top:2px; }
-
-/* Two-col */
-.two-col { display:grid; grid-template-columns:1fr 240px; gap:24px; align-items:start; }
 
 /* Email window */
 .email-window { border:1.5px solid #aac4dc; border-radius:10px; overflow:hidden; background:var(--white); }
@@ -241,18 +239,52 @@ const EJS_KEY = 'vXL_xI9ZbbJvnGdP1';
 const ADMIN_PASSWORD = 'teacher123';
 
 const DEFAULT_DATA = [
-  { emoji:'🏖️', scene:'City Beach', cardName:'Dirty Beach', cardDesc:'Garbage everywhere', title:'Beach Pollution', location:'Coastal Blvd', desc:'Too much trash near the water. No bins.', recipient:'City Council', toHint:'City Council', subjectHint:'Beach Cleaning' },
-  { emoji:'🟡', scene:'Atatürk Street', cardName:'Blocked Path', cardDesc:'Hazard for blind citizens', title:'Tactile Path Obstruction', location:'City Centre', desc:'Electric pole in the middle of the yellow path.', recipient:'Accessibility Dept', toHint:'Accessibility Dept', subjectHint:'Pathway Obstruction' },
-  { emoji:'💡', scene:'Park Street', cardName:'Dark Streets', cardDesc:'Broken lights', title:'Safety Issue: Lighting', location:'North District', desc:'Lights broken for weeks. Dangerous at night.', recipient:'Mayor Office', toHint:'Mayor Office', subjectHint:'Broken Streetlights' },
-  { emoji:'🌳', scene:'City Park', cardName:'Broken Park', cardDesc:'Damaged playground', title:'Playground Maintenance', location:'West Side', desc:'Rusty equipment. Kids getting hurt.', recipient:'Parks Dept', toHint:'Parks Dept', subjectHint:'Park Safety' }
+  { 
+    emoji: '<img src="/stadium.png">', 
+    scene: 'Stadium Way', 
+    cardName: 'Stadium Road', 
+    cardDesc: 'Dangerous potholes', 
+    title: 'Stadium Road Maintenance', 
+    location: 'Stadium Way, West District', 
+    desc: 'The road is in very bad condition. There are many deep holes (potholes) filled with water. This is very dangerous for cars, cyclists, and people walking.', 
+    recipient: 'halklailiskiler@sinop.bel.tr', 
+    toHint: '', 
+    subjectHint: 'Report: Road Repairs Needed' 
+  },
+  { 
+    emoji: '<img src="/theway.png">', 
+    scene: 'Castle Road', 
+    cardName: 'Blocked Path', 
+    cardDesc: 'Pole on yellow path', 
+    title: 'Tactile Path Obstruction', 
+    location: 'Castle Road, Coastal District', 
+    desc: 'An electric pole is standing in the middle of the yellow tactile path. This is a serious hazard for visually impaired citizens who rely on the path for safety.', 
+    recipient: 'halklailiskiler@sinop.bel.tr', 
+    toHint: '', 
+    subjectHint: 'Safety Concern: Path Obstruction' 
+  },
+  { 
+  emoji: '<img src="/busstop.png">', 
+  scene: 'School Exit', 
+  cardName: 'School Transport', 
+  cardDesc: 'Full buses & no shelter', 
+  title: 'Buses and Weather Protection', 
+  location: 'Sosyal Bilimler Lisesi Bus Stop', 
+desc: '<strong>The Problem:</strong><br>- The buses are always full.<br>- Students wait in the freezing cold.<br>- The bus stop does not protect us from rain.<br><br><strong>The Solutions:</strong><br>- Add more buses from 3:30 PM to 5:00 PM.<br>- Build a closed bus stop to stay warm.',  recipient: 'Transport Office', 
+  toHint: '', 
+  subjectHint: 'Urgent: Request for More Buses and Shelter' 
+},
+ 
+ 
 ];
 
 const DEFAULT_PHRASES = [
-  "I am writing to bring to your attention...",
-  "I would like to report a problem at...",
-  "It is a serious safety concern because...",
-  "I urge you to fix this as soon as possible.",
-  "I look forward to your prompt response."
+  "Dear City Council / To whom may it concern ",
+  "I am writing to tell you about...",
+  "I would like to report...",
+  "I urge you to solve",
+  "Sincerely",
+  "Best Regards"
 ];
 
 let data = JSON.parse(localStorage.getItem('wsData2')) || DEFAULT_DATA;
@@ -273,7 +305,9 @@ function renderScenarioGrid() {
 function selectScenario(i) {
   const s = data[i];
   document.querySelectorAll('.scenario-card').forEach((c,idx) => c.classList.toggle('active', idx===i));
-  document.getElementById('pEmoji').textContent = s.emoji;
+  
+  // Use innerHTML to support images in the emoji field
+  document.getElementById('pEmoji').innerHTML = s.emoji;
   document.getElementById('pScene').textContent = s.scene;
   document.getElementById('pTitle').textContent = s.title;
   document.getElementById('pLocation').textContent = s.location;
@@ -283,7 +317,7 @@ function selectScenario(i) {
   document.getElementById('toHint').classList.add('show');
   document.getElementById('fieldTo').placeholder = s.toHint;
   document.getElementById('fieldSubject').placeholder = s.subjectHint;
-  
+  document.getElementById('pDesc').innerHTML = s.desc;
   const panel = document.getElementById('problemPanel');
   panel.classList.add('visible');
   panel.scrollIntoView({behavior:'smooth', block:'nearest'});
@@ -323,7 +357,6 @@ async function submitEmail() {
   const activeCard = document.querySelector('.scenario-card.active .scenario-card-name');
   const scenario = activeCard ? activeCard.textContent : "None";
 
-  // Name Validation
   if (!name) {
     showStatus('error', '❌ Please enter your Name in the header.');
     nameInp.style.borderBottom = "2px solid #ef4444";
@@ -335,7 +368,7 @@ async function submitEmail() {
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
   btn.textContent = '⏳ Sending...';
-  showStatus('sending', 'Sending to teacher...');
+  showStatus('sending', 'Sending...');
 
   const fullMsg = `Student: ${name}\nClass: ${cls}\nScenario: ${scenario}\n\nStudent typed To: ${to}\n\n--- BODY ---\n${body}`;
 
@@ -349,7 +382,7 @@ async function submitEmail() {
         user_id: EJS_KEY,
         template_params: {
           student_name: name,
-          email_to: 'ivivy6211@gmail.com', // Fixed recipient
+          email_to: 'ivivy6211@gmail.com', 
           email_subject: sub || 'Writing Task Submission',
           email_body: body,
           message: fullMsg
@@ -358,7 +391,7 @@ async function submitEmail() {
     });
 
     if (res.ok) {
-      showStatus('success', '✅ Email sent to ivivy6211@gmail.com');
+      showStatus('success', '✅ Email sent');
       btn.textContent = '✓ Submitted';
       btn.style.background = '#10b981';
     } else {
