@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Worksheet 1: Writing a Formal Email</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Serif+4:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #faf6ef;
+    --ink: #1a1a2e;
+    --rust: #c0392b;
+    --gold: #b8860b;
+    --muted: #6b6b7a;
+    --paper: #f5efe3;
+    --line: #d4c9b0;
+    --success: #2d6a4f;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--cream);
+    font-family: 'Source Serif 4', Georgia, serif;
+    color: var(--ink);
+    padding: 20px;
+    line-height: 1.5;
+  }
+  .page { max-width: 700px; margin: 0 auto; }
+  .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid var(--ink); padding-bottom: 20px; }
+  h1 { font-family: 'Playfair Display', serif; font-size: 28px; margin-bottom: 5px; }
+  
+  .instruction-box {
+    background: white;
+    border: 1px solid var(--line);
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+  }
+  .instruction-box h2 { font-size: 18px; color: var(--rust); margin-bottom: 10px; }
+  .instruction-box p { font-size: 15px; margin-bottom: 8px; color: var(--ink); }
+  .instruction-box ul { margin-left: 20px; font-size: 14px; color: var(--muted); }
+
+  .options-label { font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
+  .options-bank { 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 10px; 
+    background: var(--paper); 
+    padding: 15px; 
+    border-radius: 8px;
+    margin-bottom: 30px;
+  }
+  .option-chip {
+    padding: 8px 16px;
+    background: white;
+    border: 2px solid var(--ink);
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: grab;
+    transition: 0.2s;
+    user-select: none;
+  }
+  .option-chip:hover { background: var(--ink); color: white; }
+  .option-chip.selected { background: var(--gold); color: white; border-color: var(--gold); }
+  .option-chip.used { opacity: 0.2; pointer-events: none; }
+
+  .email-card {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  }
+  .email-line { margin-bottom: 25px; padding: 10px; border-radius: 6px; }
+  .email-line.matched { background: rgba(45,106,79,0.05); border-left: 4px solid var(--success); }
+  .sentence-num { font-weight: 700; color: var(--rust); margin-right: 10px; }
+  .sentence-text { font-size: 16px; display: block; margin-bottom: 10px; }
+
+  .drop-zone {
+    width: 220px;
+    height: 35px;
+    border: 2px dashed var(--line);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .drop-zone.filled { border-style: solid; border-color: var(--ink); color: var(--ink); font-weight: 600; background: var(--paper); }
+  .drop-zone.wrong { border-color: var(--rust); color: var(--rust); background: #fff5f5; }
+
+  .actions { margin-top: 30px; display: flex; gap: 10px; }
+  .btn { padding: 12px 25px; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; font-size: 14px; }
+  .btn-check { background: var(--ink); color: white; }
+  .btn-reset { background: #eee; color: #555; }
+  
+  .result-box { margin-top: 20px; padding: 15px; border-radius: 6px; display: none; font-weight: 600; }
+  .success { background: #e8f5e9; color: var(--success); }
+  .error { background: #ffebee; color: var(--rust); }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="header">
+    <h1>Formal Email Parts</h1>
+    <p>Learn how to organize a formal message.</p>
+  </div>
+
+  <div class="instruction-box">
+    <h2>Instructions</h2>
+    <p>Look at the email below. It has 5 parts. Match the labels to the correct sentence.</p>
+    <ul>
+      <li><strong>Option 1:</strong> Click a label, then click a box in the email.</li>
+      <li><strong>Option 2:</strong> Drag a label into a box.</li>
+    </ul>
+  </div>
+
+  <span class="options-label">Labels (Mixed Order):</span>
+  <div class="options-bank" id="optionsBank">
+    <div class="option-chip" draggable="true" data-label="Problem & Location">Problem & Location</div>
+    <div class="option-chip" draggable="true" data-label="Formal Greeting">Formal Greeting</div>
+    <div class="option-chip" draggable="true" data-label="Closing & Name">Closing & Name</div>
+    <div class="option-chip" draggable="true" data-label="Opening / Purpose">Opening / Purpose</div>
+    <div class="option-chip" draggable="true" data-label="Solution / Request">Solution / Request</div>
+  </div>
+
+  <div class="email-card">
+    <div class="email-line" id="line-1">
+      <span class="sentence-text"><span class="sentence-num">1.</span> Dear Mayor and City Council,</span>
+      <div class="drop-zone" id="slot-1" data-num="1" data-answer="Formal Greeting">Click to place label</div>
+    </div>
+
+    <div class="email-line" id="line-2">
+      <span class="sentence-text"><span class="sentence-num">2.</span> I am writing to formally report a safety hazard located in our neighborhood.</span>
+      <div class="drop-zone" id="slot-2" data-num="2" data-answer="Opening / Purpose">Click to place label</div>
+    </div>
+
+    <div class="email-line" id="line-3">
+      <span class="sentence-text"><span class="sentence-num">3.</span> On the corner of Atatürk Street, a large electricity pole is in the middle of the walking path.</span>
+      <div class="drop-zone" id="slot-3" data-num="3" data-answer="Problem & Location">Click to place label</div>
+    </div>
+
+    <div class="email-line" id="line-4">
+      <span class="sentence-text"><span class="sentence-num">4.</span> Please move this pole to a safer place as soon as possible.</span>
+      <div class="drop-zone" id="slot-4" data-num="4" data-answer="Solution / Request">Click to place label</div>
+    </div>
+
+    <div class="email-line" id="line-5">
+      <span class="sentence-text"><span class="sentence-num">5.</span> Sincerely, [Your Name]</span>
+      <div class="drop-zone" id="slot-5" data-num="5" data-answer="Closing & Name">Click to place label</div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-check" onclick="checkAnswers()">Check My Work</button>
+    <button class="btn btn-reset" onclick="resetAll()">Clear All</button>
+  </div>
+  <div id="resultBox" class="result-box"></div>
+</div>
+
+<script>
+  const answers = { 1: "Formal Greeting", 2: "Opening / Purpose", 3: "Problem & Location", 4: "Solution / Request", 5: "Closing & Name" };
+  let selectedChip = null;
+  let slotContents = {};
+
+  // Initialize chips
+  document.querySelectorAll('.option-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      if (selectedChip) selectedChip.classList.remove('selected');
+      selectedChip = chip;
+      chip.classList.add('selected');
+    });
+    chip.addEventListener('dragstart', e => { e.dataTransfer.setData('text', chip.dataset.label); });
+  });
+
+  // Initialize slots
+  document.querySelectorAll('.drop-zone').forEach(slot => {
+    slot.addEventListener('click', () => {
+      if (selectedChip) {
+        placeLabel(slot, selectedChip);
+        selectedChip.classList.remove('selected');
+        selectedChip = null;
+      } else if (slot.classList.contains('filled')) {
+        removeLabel(slot);
+      }
+    });
+    slot.addEventListener('dragover', e => e.preventDefault());
+    slot.addEventListener('drop', e => {
+      e.preventDefault();
+      const label = e.dataTransfer.getData('text');
+      const chip = document.querySelector(`.option-chip[data-label="${label}"]`);
+      if (chip) placeLabel(slot, chip);
+    });
+  });
+
+  function placeLabel(slot, chip) {
+    const num = slot.dataset.num;
+    // Clear chip from other slots
+    document.querySelectorAll('.drop-zone').forEach(s => {
+      if (s.textContent === chip.dataset.label) removeLabel(s);
+    });
+    // If slot has something else, free it
+    if (slotContents[num]) removeLabel(slot);
+
+    slotContents[num] = chip.dataset.label;
+    slot.textContent = chip.dataset.label;
+    slot.classList.add('filled');
+    slot.classList.remove('wrong');
+    chip.classList.add('used');
+  }
+
+  function removeLabel(slot) {
+    const num = slot.dataset.num;
+    const label = slotContents[num];
+    const chip = document.querySelector(`.option-chip[data-label="${label}"]`);
+    if (chip) chip.classList.remove('used');
+    delete slotContents[num];
+    slot.textContent = 'Click to place label';
+    slot.classList.remove('filled', 'wrong');
+    document.getElementById('line-'+num).classList.remove('matched');
+  }
+
+  function checkAnswers() {
+    let score = 0;
+    for (let i = 1; i <= 5; i++) {
+      const slot = document.getElementById('slot-'+i);
+      const line = document.getElementById('line-'+i);
+      if (slotContents[i] === answers[i]) {
+        score++;
+        line.classList.add('matched');
+        slot.classList.remove('wrong');
+      } else if (slotContents[i]) {
+        slot.classList.add('wrong');
+      }
+    }
+    const rb = document.getElementById('resultBox');
+    rb.style.display = 'block';
+    if (score === 5) {
+      rb.className = 'result-box success';
+      rb.innerHTML = "Perfect! 5/5. You understand formal emails!";
+    } else {
+      rb.className = 'result-box error';
+      rb.innerHTML = "You got " + score + " correct. Please check the red boxes.";
+    }
+  }
+
+  function resetAll() {
+    location.reload(); // Simplest way to reshuffle and clear
+  }
+
+  // Shuffle chips on load
+  window.onload = () => {
+    const bank = document.getElementById('optionsBank');
+    for (let i = bank.children.length; i >= 0; i--) {
+        bank.appendChild(bank.children[Math.random() * i | 0]);
+    }
+  };
+</script>
+
+</body>
+</html>
