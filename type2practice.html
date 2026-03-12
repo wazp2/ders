@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Tutor — Challenge Mode</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f1117;
+            --surface: #1a1d27;
+            --surface2: #22263a;
+            --border: #2e3347;
+            --accent: #6ee7b7;
+            --accent2: #fbbf24;
+            --text: #e8eaf0;
+            --muted: #7c82a0;
+            --correct: #6ee7b7;
+            --wrong: #f87171;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            background: var(--bg);
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text);
+            min-height: 100vh;
+            padding: 32px 16px;
+        }
+
+        .wrap { max-width: 720px; margin: 0 auto; }
+
+        /* Header */
+        .header { margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
+        h1 { font-family: 'Fraunces', serif; color: var(--accent); font-size: 28px; }
+        .subtitle { color: var(--muted); font-size: 14px; margin-top: 5px; }
+
+        /* Phrase Bank */
+        .word-bank {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .bank-title { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent2); margin-bottom: 15px; font-weight: bold; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        
+        /* The Blunder now looks identical to correct items */
+        .option-item { 
+            font-size: 13px; 
+            color: var(--text); 
+            background: var(--surface2); 
+            padding: 12px; 
+            border-radius: 8px; 
+            border: 1px solid var(--border);
+            transition: transform 0.2s, border-color 0.2s;
+            line-height: 1.4;
+        }
+        .option-item:hover { transform: translateY(-2px); border-color: var(--accent); }
+
+        /* Email Card */
+        .email-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 30px;
+            line-height: 1.6;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .input-row { margin-bottom: 25px; }
+        .label { font-family: 'Fraunces', serif; font-size: 16px; color: var(--accent2); margin-bottom: 8px; display: block; }
+        
+        .input-blank {
+            background: var(--bg);
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            padding: 12px;
+            font-family: 'DM Sans', sans-serif;
+            width: 100%;
+            outline: none;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        .input-blank:focus { border-color: var(--accent); }
+        .input-blank.is-correct { border-color: var(--correct); background: rgba(110,231,183,0.05); }
+        .input-blank.is-wrong { border-color: var(--wrong); background: rgba(248,113,113,0.05); }
+
+        .context-text { font-size: 14px; color: var(--muted); margin-top: 8px; padding-left: 5px; }
+
+        /* Buttons */
+        .controls { display: flex; gap: 15px; margin-top: 25px; }
+        .btn { padding: 14px 28px; border-radius: 8px; border: none; cursor: pointer; font-weight: 700; flex: 1; transition: 0.2s; font-family: 'DM Sans', sans-serif; }
+        .btn-primary { background: var(--accent); color: var(--bg); }
+        .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+        .btn:hover { filter: brightness(1.1); }
+
+        /* Feedback Area */
+        .feedback-box {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            background: var(--surface2);
+            border-left: 4px solid var(--accent);
+            animation: slideIn 0.3s ease-out;
+        }
+        .feedback-box.active { display: block; }
+        .feedback-box.has-error { border-left-color: var(--wrong); }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) { .options-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div class="wrap">
+    <div class="header">
+        <h1>Email Challenge</h1>
+        <p class="subtitle">Complete the formal email about Atatürk Street. One option is a "trap"!</p>
+    </div>
+
+    <div class="word-bank">
+        <div class="bank-title">Phrase Bank</div>
+        <div class="options-grid" id="bankGrid">
+            </div>
+    </div>
+
+    <div class="email-card">
+        <p style="margin-bottom: 20px; font-weight: 500;">Dear City Council,</p>
+        
+        <div class="input-row">
+            <span class="label">Step A: Opening</span>
+            <input type="text" class="input-blank" id="ans-A" placeholder="Type the opening phrase..." autocomplete="off">
+            <p class="context-text">...a serious problem. There is an electricity pole in the middle of the "Yellow Road."</p>
+        </div>
+
+        <div class="input-row">
+            <span class="label">Step B: Safety Concern</span>
+            <input type="text" class="input-blank" id="ans-B" placeholder="Type the reason phrase..." autocomplete="off">
+            <p class="context-text">...our disabled citizens because they cannot walk safely.</p>
+        </div>
+
+        <div class="input-row">
+            <span class="label">Step C: Action Needed</span>
+            <input type="text" class="input-blank" id="ans-C" placeholder="Type the request phrase..." autocomplete="off">
+            <p class="context-text">...moving the pole to a different location immediately.</p>
+        </div>
+
+        <div class="input-row">
+            <span class="label">Step D: Closing</span>
+            <input type="text" class="input-blank" id="ans-D" placeholder="Type the closing phrase..." autocomplete="off">
+        </div>
+
+        <div style="margin-top:30px; color: var(--muted); line-height: 1.4;">
+            Sincerely,<br>
+            <span style="color: var(--text);">Mehmet Dönmez</span>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-primary" onclick="checkAnswers()">Check My Work</button>
+        <button class="btn btn-secondary" onclick="window.location.reload()">Reset</button>
+    </div>
+
+    <div class="feedback-box" id="feedbackBox">
+        <h3 id="fbStatus"></h3>
+        <p id="fbText" style="margin-top: 8px;"></p>
+    </div>
+</div>
+
+<script>
+    const phraseData = [
+        { text: "I am writing to bring to your attention", key: "A" },
+        { text: "It is a matter of safety for", key: "B" },
+        { text: "I urge you to consider", key: "C" },
+        { text: "I look forward to your prompt response", key: "D" },
+        // The Trap (Blunder): Formal sounding but wrong context
+        { text: "The books in the library are very old", key: "X" }
+    ];
+
+    const hints = {
+        A: "How do you state the purpose of your letter at the start?",
+        B: "Explain why the pole is dangerous for people.",
+        C: "How do you strongly ask the council to move the pole?",
+        D: "What is a formal way to say 'Please reply soon'?",
+        X: "Wait... why are you talking about books? This letter is about a street pole! 🛑"
+    };
+
+    // Shuffle Phrases and Inject into HTML
+    const bankGrid = document.getElementById('bankGrid');
+    const shuffled = [...phraseData].sort(() => Math.random() - 0.5);
+
+    shuffled.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'option-item';
+        div.textContent = item.text + "...";
+        bankGrid.appendChild(div);
+    });
+
+    function checkAnswers() {
+        let score = 0;
+        let firstWrongKey = null;
+        let blunderFound = false;
+
+        const fbBox = document.getElementById('feedbackBox');
+        fbBox.classList.remove('active', 'has-error');
+
+        ['A', 'B', 'C', 'D'].forEach(key => {
+            const input = document.getElementById('ans-' + key);
+            const val = input.value.toLowerCase().replace(/[.!]$/, "").trim();
+            const correct = phraseData.find(p => p.key === key).text.toLowerCase();
+            const blunder = phraseData.find(p => p.key === "X").text.toLowerCase();
+
+            input.classList.remove('is-correct', 'is-wrong');
+
+            if (val === blunder) {
+                blunderFound = true;
+                input.classList.add('is-wrong');
+                if (!firstWrongKey) firstWrongKey = 'X';
+            } else if (val === correct) {
+                input.classList.add('is-correct');
+                score++;
+            } else {
+                input.classList.add('is-wrong');
+                if (!firstWrongKey) firstWrongKey = key;
+            }
+        });
+
+        // Show Feedback
+        fbBox.classList.add('active');
+        const status = document.getElementById('fbStatus');
+        const text = document.getElementById('fbText');
+
+        if (blunderFound) {
+            fbBox.classList.add('has-error');
+            status.textContent = "Wrong Topic!";
+            status.style.color = "var(--wrong)";
+            text.textContent = hints['X'];
+        } else if (score === 4) {
+            status.textContent = "Excellent! 🏆";
+            status.style.color = "var(--correct)";
+            text.textContent = "You used all the formal phrases correctly and stayed on topic. Well done!";
+        } else {
+            fbBox.classList.add('has-error');
+            status.textContent = `Score: ${score}/4`;
+            status.style.color = "var(--accent2)";
+            text.textContent = hints[firstWrongKey];
+        }
+    }
+</script>
+
+</body>
+</html>
