@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>City Problem Solver: Professional Writing Task</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #eef3f8; --white: #ffffff;
+  --blue-deep: #1e3a5f; --blue-mid: #2e6da4;
+  --blue-soft: #c8ddf0; --blue-pale: #e4eef8;
+  --grey-dark: #3d4a5c; --grey-mid: #6b7a8d;
+  --grey-line: #b8c8d8; --grey-bg: #f2f5f8;
+}
+body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--grey-dark); min-height: 100vh; padding: 30px 20px 60px; }
+.page { max-width: 980px; margin: 0 auto; }
+
+/* Browser bar */
+.browser-bar { background: #d0dce8; border-radius: 10px 10px 0 0; padding: 10px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #b0c4d8; }
+.browser-dots { display: flex; gap: 6px; }
+.browser-dots span { width: 11px; height: 11px; border-radius: 50%; }
+.d1{background:#f87171;}.d2{background:#fbbf24;}.d3{background:#6ee7b7;}
+.browser-url { flex:1; background:#e8eff6; border-radius:20px; padding:4px 14px; font-size:11px; color:var(--grey-mid); border:1px solid #c0d0e0; }
+.admin-btn-top { background:none; border:1px solid #a0b4c8; border-radius:6px; padding:4px 10px; font-size:10px; color:var(--grey-mid); cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.2s; display:flex; align-items:center; gap:5px; }
+.admin-btn-top:hover { background:rgba(255,255,255,0.5); color:var(--blue-deep); border-color:var(--blue-mid); }
+
+/* Main card */
+.card { background:var(--white); border-radius:0 0 12px 12px; border:1px solid #c8d8e8; border-top:none; padding:32px 32px 40px; box-shadow:0 6px 28px rgba(30,58,95,0.08); }
+
+/* Header */
+.worksheet-header { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; margin-bottom:28px; padding-bottom:20px; border-bottom:2px solid var(--blue-soft); }
+.ws-eyebrow { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--blue-mid); font-weight:600; margin-bottom:6px; }
+.ws-title { font-family:'Fraunces',serif; font-size:clamp(18px,3vw,26px); font-weight:700; color:var(--blue-deep); line-height:1.2; }
+.ws-subtitle { font-size:12.5px; color:var(--grey-mid); margin-top:5px; font-weight:300; }
+.header-meta { display:flex; flex-direction:column; gap:7px; align-items:flex-end; flex-shrink:0; }
+.meta-field { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--grey-mid); }
+.meta-input { width:130px; border:none; border-bottom:1.5px solid var(--grey-line); background:transparent; font-family:'DM Sans',sans-serif; font-size:12px; color:var(--grey-dark); padding:2px 4px; outline:none; }
+.meta-input:focus { border-bottom-color:var(--blue-mid); }
+
+/* Step row */
+.step-row { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+.step-badge { width:24px; height:24px; background:var(--blue-deep); color:white; border-radius:50%; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.step-title { font-size:13px; font-weight:600; color:var(--blue-deep); }
+
+/* Scenario cards */
+.scenario-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:24px; }
+.scenario-card { border:2px solid var(--blue-soft); border-radius:10px; overflow:hidden; cursor:pointer; transition:all 0.2s; background:var(--white); user-select:none; }
+.scenario-card:hover { border-color:var(--blue-mid); transform:translateY(-2px); box-shadow:0 4px 14px rgba(46,109,164,0.15); }
+.scenario-card.active { border-color:var(--blue-mid); box-shadow:0 4px 16px rgba(46,109,164,0.25); }
+.scenario-emoji-box { height:80px; display:flex; align-items:center; justify-content:center; font-size:36px; background:var(--blue-pale); transition:background 0.2s; overflow:hidden; position:relative; }
+.scenario-emoji-box img { width:100%; height:100%; object-fit:cover; position:absolute; inset:0; }
+.scenario-card.active .scenario-emoji-box { background:#d0e8f8; }
+.scenario-card-body { padding:10px 12px 12px; }
+.scenario-card-name { font-size:13px; font-weight:600; color:var(--blue-deep); margin-bottom:3px; }
+.scenario-card-desc { font-size:11px; color:var(--grey-mid); line-height:1.4; font-weight:300; }
+.selected-tag { display:none; align-items:center; gap:4px; margin-top:6px; font-size:10.5px; font-weight:600; color:var(--blue-mid); }
+.scenario-card.active .selected-tag { display:flex; }
+
+/* Problem panel */
+.problem-panel { display:none; background:var(--blue-pale); border:1.5px solid var(--blue-soft); border-radius:12px; padding:22px; margin-bottom:28px; }
+.problem-panel.visible { display:block; animation:fadeSlide 0.25s ease; }
+@keyframes fadeSlide { from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);} }
+.problem-inner { display:grid; grid-template-columns:200px 1fr; gap:22px; align-items:start; }
+.problem-image-box { background:var(--white); border:1.5px solid var(--blue-soft); border-radius:10px; height:180px; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; overflow:hidden; }
+.problem-big-emoji { font-size:72px; line-height:1; }
+.problem-scene { position:absolute; bottom:0; left:0; right:0; background:rgba(30,58,95,0.82); color:white; font-size:10px; text-align:center; padding:6px; font-weight:500; letter-spacing:0.5px; z-index:1; }
+.problem-details { display:flex; flex-direction:column; gap:12px; }
+.problem-title { font-family:'Fraunces',serif; font-size:18px; font-weight:700; color:var(--blue-deep); line-height:1.2; }
+.detail-block { display:flex; flex-direction:column; gap:3px; }
+.detail-key { font-size:9.5px; letter-spacing:2px; text-transform:uppercase; color:var(--blue-mid); font-weight:600; }
+.detail-val { font-size:13.5px; color:var(--grey-dark); line-height:1.5; font-weight:300; }
+.recipient-pill { display:inline-flex; align-items:center; gap:7px; background:var(--blue-deep); color:white; border-radius:20px; padding:6px 14px; font-size:12.5px; font-weight:500; width:fit-content; margin-top:2px; }
+
+/* Two-col */
+.two-col { display:grid; grid-template-columns:1fr 220px; gap:24px; align-items:start; }
+
+/* Email window */
+.email-window { border:1.5px solid #aac4dc; border-radius:10px; overflow:hidden; background:var(--white); }
+.email-titlebar { background:linear-gradient(to right,#d8e8f4,#e8f0f8); border-bottom:1px solid #aac4dc; padding:8px 14px; display:flex; align-items:center; gap:10px; }
+.email-titlebar-dots { display:flex; gap:5px; }
+.email-titlebar-dots span { width:9px; height:9px; border-radius:50%; background:var(--grey-line); }
+.email-titlebar-label { font-size:11px; color:var(--grey-mid); letter-spacing:1px; text-transform:uppercase; font-weight:500; }
+.email-fields { border-bottom:1px solid #d8e8f4; }
+.email-field-row { display:flex; align-items:center; border-bottom:1px solid #e8f0f8; padding:6px 14px; min-height:44px; gap:10px; }
+.email-field-row:last-child { border-bottom:none; }
+.field-key { font-size:11px; font-weight:600; color:var(--blue-mid); text-transform:uppercase; letter-spacing:0.5px; min-width:68px; flex-shrink:0; }
+.field-input { flex:1; border:none; background:transparent; font-family:'DM Sans',sans-serif; font-size:14px; color:var(--grey-dark); outline:none; padding:4px 2px; min-width:0; }
+.field-input::placeholder { color:#b0bec8; font-style:italic; font-size:13px; }
+.field-input:focus { background:#f6faff; border-radius:4px; padding:4px 8px; }
+.field-hint-tag { font-size:10.5px; color:white; background:var(--blue-mid); border-radius:12px; padding:2px 10px; white-space:nowrap; display:none; flex-shrink:0; }
+.field-hint-tag.show { display:inline-block; }
+.email-body-area { padding:14px 14px 16px; }
+.body-label { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--grey-mid); font-weight:600; margin-bottom:8px; }
+.body-textarea { width:100%; min-height:280px; border:1px solid #d0e4f0; border-radius:8px; background:#fafcff; padding:14px; font-family:'DM Sans',sans-serif; font-size:14.5px; color:var(--grey-dark); line-height:2; resize:vertical; outline:none; transition:border-color 0.2s; }
+.body-textarea::placeholder { color:#b8c8d4; font-style:italic; font-size:13px; line-height:1.8; }
+.body-textarea:focus { border-color:var(--blue-mid); background:#f5faff; }
+.word-count { font-size:11px; color:var(--grey-mid); text-align:right; margin-top:5px; }
+.word-count span { color:var(--blue-mid); font-weight:600; }
+.structure-guide { display:flex; margin-top:10px; border-radius:6px; overflow:hidden; border:1px solid var(--blue-soft); }
+.struct-part { flex:1; padding:5px 4px; text-align:center; font-size:9.5px; font-weight:600; text-transform:uppercase; line-height:1.3; }
+.sp-greeting{background:#dbeafe;color:#1e40af;} .sp-problem{background:#fee2e2;color:#991b1b;}
+.sp-solution{background:#d1fae5;color:#065f46;} .sp-closing{background:#ede9fe;color:#5b21b6;}
+
+/* Sidebar */
+.sidebar { display:flex; flex-direction:column; gap:16px; }
+.level-badge { background:var(--blue-soft); border:1px solid #a0bcd8; border-radius:8px; padding:10px 14px; text-align:center; }
+.level-label { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--grey-mid); font-weight:600; }
+.level-val { font-family:'Fraunces',serif; font-size:22px; font-weight:700; color:var(--blue-deep); line-height:1; margin:4px 0; }
+.level-desc { font-size:10.5px; color:var(--grey-mid); font-weight:300; }
+.checklist-box { background:var(--grey-bg); border:1px solid var(--grey-line); border-radius:10px; overflow:hidden; }
+.checklist-header { background:var(--blue-deep); color:white; padding:10px 14px; font-size:11px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; }
+.checklist-body { padding:12px 14px; display:flex; flex-direction:column; gap:11px; }
+.check-item { display:flex; align-items:flex-start; gap:9px; cursor:pointer; }
+.check-box { width:15px; height:15px; border:2px solid var(--grey-line); border-radius:3px; flex-shrink:0; margin-top:1px; background:white; transition:all 0.15s; display:flex; align-items:center; justify-content:center; }
+.check-box.ticked { background:var(--blue-mid); border-color:var(--blue-mid); }
+.check-box.ticked::after { content:'✓'; color:white; font-size:10px; font-weight:700; }
+.check-text { font-size:11.5px; color:var(--grey-dark); line-height:1.4; }
+.check-example { font-size:10px; color:var(--blue-mid); font-style:italic; margin-top:1px; display:block; }
+.phrases-box { background:var(--blue-pale); border:1px solid var(--blue-soft); border-radius:10px; overflow:hidden; }
+.phrases-header { background:var(--blue-mid); color:white; padding:10px 14px; font-size:11px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; }
+.phrases-body { padding:10px 12px; display:flex; flex-direction:column; gap:6px; }
+.phrase-item { font-size:11px; color:var(--blue-deep); line-height:1.4; padding:6px 9px; background:rgba(255,255,255,0.75); border-radius:5px; border-left:2px solid var(--blue-mid); font-style:italic; font-weight:300; cursor:pointer; transition:background 0.15s; }
+.phrase-item:hover { background:rgba(255,255,255,1); }
+.phrase-tip { font-size:9.5px; color:var(--grey-mid); text-align:center; margin-top:2px; font-style:italic; }
+
+
+/* Submit button */
+.submit-btn { width:100%; padding:13px; border-radius:10px; border:none; background:var(--blue-deep); color:white; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:600; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:8px; }
+.submit-btn:hover { background:#162d4e; transform:translateY(-1px); box-shadow:0 4px 14px rgba(30,58,95,0.3); }
+.submit-btn:disabled { background:var(--grey-line); cursor:not-allowed; transform:none; box-shadow:none; }
+.submit-status { font-size:12px; text-align:center; margin-top:8px; min-height:18px; font-weight:500; }
+.submit-status.success { color:#10b981; }
+.submit-status.error { color:#ef4444; }
+.submit-status.sending { color:var(--blue-mid); }
+
+@media(max-width:780px){ .two-col{grid-template-columns:1fr;} .scenario-grid{grid-template-columns:1fr 1fr;} .problem-inner{grid-template-columns:1fr;} .header-meta{display:none;} }
+
+/* ═══════ ADMIN PANEL ═══════ */
+.admin-overlay { display:none; position:fixed; inset:0; z-index:1000; background:rgba(10,18,30,0.75); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:20px; }
+.admin-overlay.open { display:flex; }
+.pw-modal { background:#1a2640; border:1px solid #2e4a6e; border-radius:16px; padding:36px 40px; width:100%; max-width:380px; text-align:center; box-shadow:0 24px 60px rgba(0,0,0,0.5); animation:modalIn 0.2s ease; }
+@keyframes modalIn { from{opacity:0;transform:scale(0.95);}to{opacity:1;transform:scale(1);} }
+.pw-icon { font-size:36px; margin-bottom:12px; }
+.pw-title { font-family:'Fraunces',serif; font-size:20px; font-weight:600; color:#e8eaf0; margin-bottom:6px; }
+.pw-sub { font-size:12px; color:#7c82a0; font-weight:300; margin-bottom:24px; }
+.pw-input { width:100%; padding:12px 16px; border-radius:8px; border:1.5px solid #2e4a6e; background:#111827; font-family:'DM Sans',sans-serif; font-size:15px; color:#e8eaf0; outline:none; text-align:center; letter-spacing:3px; margin-bottom:12px; transition:border-color 0.2s; }
+.pw-input:focus { border-color:#6ee7b7; }
+.pw-input.error { border-color:#f87171; animation:shake 0.3s ease; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+.pw-error { font-size:11px; color:#f87171; margin-bottom:10px; height:16px; }
+.pw-btn { width:100%; padding:12px; border-radius:8px; background:#2e6da4; border:none; color:white; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:600; cursor:pointer; transition:background 0.2s; }
+.pw-btn:hover { background:#1e5a90; }
+.pw-cancel { margin-top:12px; font-size:12px; color:#7c82a0; cursor:pointer; display:block; }
+.pw-cancel:hover { color:#e8eaf0; }
+.admin-panel { background:#f0f4f8; border-radius:16px; width:100%; max-width:820px; max-height:90vh; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 24px 60px rgba(0,0,0,0.4); animation:modalIn 0.2s ease; }
+.admin-topbar { background:var(--blue-deep); color:white; padding:16px 24px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+.admin-topbar-left { display:flex; align-items:center; gap:12px; }
+.admin-topbar-icon { font-size:20px; }
+.admin-topbar-title { font-family:'Fraunces',serif; font-size:17px; font-weight:600; }
+.admin-topbar-sub { font-size:11px; color:rgba(255,255,255,0.6); margin-top:2px; }
+.admin-close-btn { width:32px; height:32px; border-radius:8px; background:rgba(255,255,255,0.1); border:none; color:white; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background 0.2s; }
+.admin-close-btn:hover { background:rgba(255,255,255,0.2); }
+.admin-tabs { background:white; border-bottom:1px solid #c8d8e8; display:flex; padding:0 24px; flex-shrink:0; }
+.admin-tab { padding:12px 16px; font-size:12px; font-weight:500; color:var(--grey-mid); cursor:pointer; border-bottom:2px solid transparent; transition:all 0.2s; white-space:nowrap; }
+.admin-tab:hover { color:var(--blue-deep); }
+.admin-tab.active { color:var(--blue-mid); border-bottom-color:var(--blue-mid); font-weight:600; }
+.admin-content { overflow-y:auto; padding:24px; flex:1; }
+.admin-scenario-list { display:flex; flex-direction:column; gap:12px; }
+.admin-scenario-item { background:white; border:1px solid #c8d8e8; border-radius:12px; overflow:hidden; }
+.admin-scenario-header { padding:14px 18px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:background 0.15s; }
+.admin-scenario-header:hover { background:#f6faff; }
+.admin-scenario-num { width:26px; height:26px; background:var(--blue-deep); color:white; border-radius:50%; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.admin-scenario-name { font-size:13px; font-weight:600; color:var(--blue-deep); flex:1; }
+.admin-scenario-toggle { font-size:18px; color:var(--grey-mid); transition:transform 0.2s; }
+.admin-scenario-item.open .admin-scenario-toggle { transform:rotate(180deg); }
+.admin-scenario-body { display:none; padding:0 18px 18px; border-top:1px solid #e8f0f8; }
+.admin-scenario-item.open .admin-scenario-body { display:block; }
+.admin-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:16px; }
+.admin-form-full { grid-column:1/-1; }
+.admin-field { display:flex; flex-direction:column; gap:5px; }
+.admin-label { font-size:10px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:var(--blue-mid); }
+.admin-input, .admin-textarea { padding:9px 12px; border:1.5px solid #c8d8e8; border-radius:7px; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--grey-dark); background:#fafcff; outline:none; transition:border-color 0.2s; width:100%; }
+.admin-input:focus, .admin-textarea:focus { border-color:var(--blue-mid); background:white; }
+.admin-textarea { resize:vertical; min-height:80px; line-height:1.6; }
+.photo-upload-area { border:2px dashed #c8d8e8; border-radius:8px; padding:16px; text-align:center; cursor:pointer; transition:all 0.2s; background:#f6faff; position:relative; }
+.photo-upload-area:hover { border-color:var(--blue-mid); background:#edf5ff; }
+.photo-preview { width:100%; max-height:120px; object-fit:cover; border-radius:6px; margin-bottom:8px; display:none; }
+.photo-preview.show { display:block; }
+.photo-upload-icon { font-size:24px; margin-bottom:6px; }
+.photo-upload-text { font-size:11px; color:var(--grey-mid); }
+.photo-upload-hint { font-size:10px; color:#a0b0c0; margin-top:3px; }
+.photo-remove-btn { display:none; margin-top:6px; font-size:10px; color:#f87171; cursor:pointer; background:none; border:none; font-family:'DM Sans',sans-serif; }
+.photo-remove-btn.show { display:inline-block; }
+.media-toggle { display:flex; gap:8px; margin-bottom:10px; }
+.media-opt { flex:1; padding:7px; border:1.5px solid #c8d8e8; border-radius:7px; text-align:center; font-size:11px; font-weight:500; color:var(--grey-mid); cursor:pointer; transition:all 0.2s; background:white; }
+.media-opt.active { border-color:var(--blue-mid); color:var(--blue-mid); background:#edf5ff; }
+.phrases-admin-list { display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
+.phrase-admin-row { display:flex; align-items:center; gap:8px; background:white; border:1px solid #c8d8e8; border-radius:8px; padding:10px 12px; }
+.phrase-admin-input { flex:1; border:none; background:transparent; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--grey-dark); outline:none; }
+.phrase-del-btn { width:26px; height:26px; border-radius:6px; border:none; background:#fee2e2; color:#ef4444; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background 0.15s; }
+.phrase-del-btn:hover { background:#fecaca; }
+.phrase-add-btn { display:flex; align-items:center; gap:6px; padding:9px 14px; border:1.5px dashed #c8d8e8; border-radius:8px; background:none; font-family:'DM Sans',sans-serif; font-size:12px; color:var(--grey-mid); cursor:pointer; transition:all 0.2s; width:100%; }
+.phrase-add-btn:hover { border-color:var(--blue-mid); color:var(--blue-mid); background:#f0f8ff; }
+.admin-save-bar { background:white; border-top:1px solid #c8d8e8; padding:14px 24px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+.admin-save-btn { padding:10px 24px; border-radius:8px; border:none; background:var(--blue-mid); color:white; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; cursor:pointer; transition:background 0.2s; }
+.admin-save-btn:hover { background:#1e5a90; }
+.admin-reset-btn { padding:10px 16px; border-radius:8px; border:1px solid #c8d8e8; background:white; color:var(--grey-mid); font-family:'DM Sans',sans-serif; font-size:12px; cursor:pointer; transition:all 0.2s; }
+.admin-reset-btn:hover { border-color:#f87171; color:#ef4444; }
+.admin-save-status { font-size:12px; color:#10b981; font-weight:500; opacity:0; transition:opacity 0.3s; }
+.admin-save-status.show { opacity:1; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="browser-bar">
+    <div class="browser-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+    <div class="browser-url">📧 &nbsp; citywriting.edu / formal-email-task</div>
+    <button class="admin-btn-top" onclick="openAdminLogin()">⚙️ Admin</button>
+  </div>
+
+  <div class="card">
+    <div class="worksheet-header">
+      <div>
+        <div class="ws-eyebrow">9th Grade · English Writing · A2+</div>
+        <div class="ws-title">City Problem Solver:<br>Professional Writing Task</div>
+        <div class="ws-subtitle">Choose a real city problem, then write a formal email to the right official.</div>
+      </div>
+      <div class="header-meta">
+        <div class="meta-field">Name <input class="meta-input" placeholder="your name"></div>
+        <div class="meta-field">Class <input class="meta-input" placeholder="class"></div>
+        <div class="meta-field">Date <input class="meta-input" placeholder="date"></div>
+      </div>
+    </div>
+
+    <div class="step-row">
+      <div class="step-badge">1</div>
+      <div class="step-title">Choose your problem — click a card to see full details</div>
+    </div>
+
+    <div class="scenario-grid" id="scenarioGrid"></div>
+
+    <div class="problem-panel" id="problemPanel">
+      <div class="problem-inner">
+        <div class="problem-image-box" id="pImageBox">
+          <div class="problem-big-emoji" id="pEmoji"></div>
+          <div class="problem-scene" id="pScene"></div>
+        </div>
+        <div class="problem-details">
+          <div class="problem-title" id="pTitle"></div>
+          <div class="detail-block">
+            <div class="detail-key">📍 Location</div>
+            <div class="detail-val" id="pLocation"></div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-key">⚠️ What is the problem?</div>
+            <div class="detail-val" id="pDesc"></div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-key">📬 Who should you write to?</div>
+            <div class="recipient-pill"><span>👤</span><span id="pRecipient"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-row" style="margin-bottom:12px;">
+      <div class="step-badge">2</div>
+      <div class="step-title">Write your formal email below</div>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <div class="email-window">
+          <div class="email-titlebar">
+            <div class="email-titlebar-dots"><span></span><span></span><span></span></div>
+            <div class="email-titlebar-label">New Message — Compose</div>
+          </div>
+          <div class="email-fields">
+            <div class="email-field-row">
+              <span class="field-key">To:</span>
+              <input class="field-input" id="fieldTo" type="text" placeholder="Who will you write to?">
+              <span class="field-hint-tag" id="toHint"></span>
+            </div>
+            <div class="email-field-row">
+              <span class="field-key">Subject:</span>
+              <input class="field-input" id="fieldSubject" type="text" placeholder="Write a short, formal subject line…">
+            </div>
+          </div>
+          <div class="email-body-area">
+            <div class="body-label">Message Body</div>
+            <textarea class="body-textarea" id="bodyText" oninput="updateWordCount()" placeholder="Dear [Name/Title],
+
+I am writing to bring to your attention…
+
+[Describe the problem and its location]
+
+[Ask for a specific solution — I urge you to…]
+
+I look forward to your prompt response.
+
+Sincerely,
+[Your Name]"></textarea>
+            <div class="word-count">Words: <span id="wordCount">0</span></div>
+            <div class="structure-guide">
+              <div class="struct-part sp-greeting">Greeting</div>
+              <div class="struct-part sp-problem">Problem &amp; Location</div>
+              <div class="struct-part sp-solution">Solution / Request</div>
+              <div class="struct-part sp-closing">Closing &amp; Name</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar">
+        <div class="level-badge">
+          <div class="level-label">Level</div>
+          <div class="level-val">A2+</div>
+          <div class="level-desc">Formal Writing Task</div>
+        </div>
+        <button class="submit-btn" id="submitBtn" onclick="submitEmail()">
+          <span id="submitBtnText">📤 Submit Email</span>
+        </button>
+        <div class="submit-status" id="submitStatus"></div>
+
+        <div class="checklist-box">
+          <div class="checklist-header">✓ Writing Checklist</div>
+          <div class="checklist-body">
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Formal greeting?<span class="check-example">Dear Mayor, / Dear City Council,</span></div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Did I state why I am writing?<span class="check-example">I am writing to tell you about…</span></div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Did I explain the location?<span class="check-example">on Park Street / at the city beach</span></div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Did I describe the problem clearly?</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Did I ask for a specific solution?<span class="check-example">I urge you to… / Please send…</span></div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Formal closing?<span class="check-example">Sincerely, / Best regards,</span></div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Did I sign my name?</div></div>
+          </div>
+        </div>
+        <div class="phrases-box">
+          <div class="phrases-header">💬 Useful Phrases</div>
+          <div class="phrases-body" id="phrasesList"></div>
+          <div class="phrase-tip">Click a phrase to insert it</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN OVERLAY -->
+<div class="admin-overlay" id="adminOverlay">
+
+  <div class="pw-modal" id="pwModal">
+    <div class="pw-icon">🔐</div>
+    <div class="pw-title">Admin Access</div>
+    <div class="pw-sub">Enter the password to edit scenarios and phrases</div>
+    <input class="pw-input" id="pwInput" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter') checkPassword()">
+    <div class="pw-error" id="pwError"></div>
+    <button class="pw-btn" onclick="checkPassword()">Enter Admin Panel</button>
+    <span class="pw-cancel" onclick="closeAdmin()">Cancel</span>
+  </div>
+
+  <div class="admin-panel" id="adminPanel" style="display:none;">
+    <div class="admin-topbar">
+      <div class="admin-topbar-left">
+        <div class="admin-topbar-icon">⚙️</div>
+        <div>
+          <div class="admin-topbar-title">Admin Panel</div>
+          <div class="admin-topbar-sub">Edit scenarios, photos and useful phrases</div>
+        </div>
+      </div>
+      <button class="admin-close-btn" onclick="closeAdmin()">✕</button>
+    </div>
+    <div class="admin-tabs">
+      <div class="admin-tab active" onclick="switchAdminTab('scenarios',this)">📋 Scenarios</div>
+      <div class="admin-tab" onclick="switchAdminTab('phrases',this)">💬 Useful Phrases</div>
+    </div>
+    <div class="admin-content" id="adminTabScenarios">
+      <div class="admin-scenario-list" id="adminScenarioList"></div>
+    </div>
+    <div class="admin-content" id="adminTabPhrases" style="display:none;">
+      <div class="phrases-admin-list" id="phrasesAdminList"></div>
+      <button class="phrase-add-btn" onclick="addAdminPhrase()">＋ Add a phrase</button>
+    </div>
+    <div class="admin-save-bar">
+      <button class="admin-reset-btn" onclick="resetToDefaults()">↺ Reset to defaults</button>
+      <div style="display:flex;align-items:center;gap:14px;">
+        <span class="admin-save-status" id="adminSaveStatus">✓ Saved!</span>
+        <button class="admin-save-btn" onclick="saveAdminChanges()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const ADMIN_PASSWORD = 'teacher123';
+
+const DEFAULT_DATA = [
+  { emoji:'🏖️', photoData:null, usePhoto:false, scene:'City Beach · Coastal Boulevard', cardName:'The Shore', cardDesc:'Garbage on the city beach', title:'The Shore — Beach Garbage Problem', location:'City Beach, Coastal Boulevard — the main public beach area near the harbour', desc:'Large amounts of garbage are left on the sand every day. The beach is dirty, smells bad, and is unsafe for families and tourists. There are no bins near the water and no regular cleaning team.', recipient:'The City Council — Environmental Committee', toHint:'City Council — Environmental Committee', subjectHint:'Urgent: Garbage Problem at City Beach' },
+  { emoji:'🟡', photoData:null, usePhoto:false, scene:'Atatürk Street · City Centre', cardName:'The Yellow Road', cardDesc:'Blocked disabled walkway', title:'The Yellow Road — Blocked Disabled Pathway', location:'Atatürk Street, City Centre — the "Yellow Road" tactile path for blind and disabled citizens', desc:'An electricity pole has been placed directly in the middle of the Yellow Road — the special tactile path designed for blind and disabled citizens. It is a serious safety hazard that prevents safe movement.', recipient:'The City Council — Accessibility Department', toHint:'City Council — Accessibility Department', subjectHint:'Accessibility Concern: Blocked Pathway on Atatürk Street' },
+  { emoji:'💡', photoData:null, usePhoto:false, scene:'Park Street · North District', cardName:'Dark Streets', cardDesc:'Broken streetlights at night', title:'Dark Streets — Broken Streetlights', location:'Park Street, North District — between Oak Avenue and River Road, a busy pedestrian route', desc:'Six streetlights on Park Street have been broken for three weeks. At night the road is completely dark, making it very dangerous for pedestrians, cyclists, and drivers. There have already been two accidents.', recipient:"The Mayor's Office — Public Safety Division", toHint:"Mayor's Office — Public Safety Division", subjectHint:'Urgent Safety Issue: Broken Streetlights on Park Street' },
+  { emoji:'🌳', photoData:null, usePhoto:false, scene:'Central City Park · West Side', cardName:'Broken Park', cardDesc:'Damaged park equipment', title:'Broken Park — Damaged Equipment', location:"Central City Park, West Side — near the main children's playground and family picnic area", desc:"Several park benches are broken and the children's playground equipment is severely damaged. Rusty metal parts are exposed and children could get seriously hurt. The park has not been maintained for over three months.", recipient:'The City Council — Parks & Recreation Department', toHint:'City Council — Parks & Recreation Dept.', subjectHint:'Concern: Damaged Equipment at Central City Park' }
+];
+const DEFAULT_PHRASES = ['I am writing to bring to your attention…','It is a matter of safety for…','I urge you to consider…','I would like to report…','I look forward to your prompt response.'];
+
+function loadData() { try { const s=localStorage.getItem('wsData2'); return s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT_DATA)); } catch(e){return JSON.parse(JSON.stringify(DEFAULT_DATA));} }
+function loadPhrases() { try { const s=localStorage.getItem('wsPhrases2'); return s?JSON.parse(s):[...DEFAULT_PHRASES]; } catch(e){return [...DEFAULT_PHRASES];} }
+function persist() { try { localStorage.setItem('wsData2',JSON.stringify(data)); localStorage.setItem('wsPhrases2',JSON.stringify(phrases)); } catch(e){} }
+
+let data = loadData();
+let phrases = loadPhrases();
+
+/* ── Student view ── */
+function renderScenarioGrid() {
+  const grid = document.getElementById('scenarioGrid');
+  grid.innerHTML = '';
+  data.forEach((s,i) => {
+    const card = document.createElement('div');
+    card.className = 'scenario-card';
+    card.onclick = () => selectScenario(i);
+    const mediaHTML = (s.usePhoto && s.photoData)
+      ? `<div class="scenario-emoji-box" style="padding:0;"><img src="${s.photoData}" alt="" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;"><span style="position:relative;z-index:1;display:none"></span></div>`
+      : `<div class="scenario-emoji-box">${s.emoji}</div>`;
+    card.innerHTML = `${mediaHTML}<div class="scenario-card-body"><div class="scenario-card-name">${esc(s.cardName)}</div><div class="scenario-card-desc">${esc(s.cardDesc)}</div><div class="selected-tag">✓ Selected</div></div>`;
+    grid.appendChild(card);
+  });
+}
+
+function renderPhrasesList() {
+  const list = document.getElementById('phrasesList');
+  list.innerHTML = '';
+  phrases.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'phrase-item';
+    div.textContent = p;
+    div.onclick = () => insertPhrase(div);
+    list.appendChild(div);
+  });
+}
+
+function selectScenario(i) {
+  const s = data[i];
+  document.querySelectorAll('.scenario-card').forEach((c,idx) => c.classList.toggle('active',idx===i));
+  const box = document.getElementById('pImageBox');
+  const emojiEl = document.getElementById('pEmoji');
+  const oldImg = box.querySelector('img.pp');
+  if (oldImg) oldImg.remove();
+  if (s.usePhoto && s.photoData) {
+    emojiEl.style.display = 'none';
+    const img = document.createElement('img');
+    img.className = 'pp';
+    img.src = s.photoData;
+    img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
+    box.insertBefore(img, box.firstChild);
+  } else {
+    emojiEl.style.display = '';
+    emojiEl.textContent = s.emoji;
+  }
+  document.getElementById('pScene').textContent = s.scene;
+  document.getElementById('pTitle').textContent = s.title;
+  document.getElementById('pLocation').textContent = s.location;
+  document.getElementById('pDesc').textContent = s.desc;
+  document.getElementById('pRecipient').textContent = s.recipient;
+  const th = document.getElementById('toHint');
+  th.textContent = '→ ' + s.toHint; th.classList.add('show');
+  document.getElementById('fieldTo').placeholder = 'e.g. ' + s.toHint;
+  document.getElementById('fieldSubject').placeholder = 'e.g. ' + s.subjectHint;
+  const panel = document.getElementById('problemPanel');
+  panel.classList.remove('visible'); void panel.offsetWidth; panel.classList.add('visible');
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function toggleCheck(item) { item.querySelector('.check-box').classList.toggle('ticked'); }
+function insertPhrase(el) {
+  const phrase = el.textContent.trim(), ta = document.getElementById('bodyText');
+  ta.focus();
+  const s=ta.selectionStart,e=ta.selectionEnd,before=ta.value.substring(0,s),after=ta.value.substring(e);
+  const gap=(before.length>0&&!before.endsWith('\n')&&!before.endsWith(' '))?' ':'';
+  const ins=gap+phrase; ta.value=before+ins+after;
+  ta.selectionStart=ta.selectionEnd=s+ins.length; updateWordCount();
+}
+function updateWordCount() { const t=document.getElementById('bodyText').value.trim(); document.getElementById('wordCount').textContent=t===''?0:t.split(/\s+/).length; }
+
+/* ── Admin ── */
+function openAdminLogin() {
+  document.getElementById('adminOverlay').classList.add('open');
+  document.getElementById('pwModal').style.display='';
+  document.getElementById('adminPanel').style.display='none';
+  document.getElementById('pwInput').value='';
+  document.getElementById('pwError').textContent='';
+  setTimeout(()=>document.getElementById('pwInput').focus(),100);
+}
+function checkPassword() {
+  if (document.getElementById('pwInput').value===ADMIN_PASSWORD) {
+    document.getElementById('pwModal').style.display='none';
+    document.getElementById('adminPanel').style.display='flex';
+    renderAdminScenarios(); renderAdminPhrases();
+  } else {
+    document.getElementById('pwError').textContent='Incorrect password. Try again.';
+    const inp=document.getElementById('pwInput');
+    inp.classList.add('error'); setTimeout(()=>inp.classList.remove('error'),400);
+    inp.value=''; inp.focus();
+  }
+}
+function closeAdmin() { document.getElementById('adminOverlay').classList.remove('open'); }
+function switchAdminTab(tab,btn) {
+  document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active')); btn.classList.add('active');
+  document.getElementById('adminTabScenarios').style.display=tab==='scenarios'?'':'none';
+  document.getElementById('adminTabPhrases').style.display=tab==='phrases'?'':'none';
+}
+
+function renderAdminScenarios() {
+  const list = document.getElementById('adminScenarioList');
+  list.innerHTML = '';
+  data.forEach((s,i) => {
+    const item = document.createElement('div');
+    item.className = 'admin-scenario-item';
+    item.id = 'ai_'+i;
+    item.innerHTML = `
+<div class="admin-scenario-header" onclick="toggleAI(${i})">
+  <div class="admin-scenario-num">${i+1}</div>
+  <div class="admin-scenario-name">${esc(s.cardName)}</div>
+  <div class="admin-scenario-toggle">⌄</div>
+</div>
+<div class="admin-scenario-body">
+  <div class="admin-form-grid">
+    <div class="admin-field"><div class="admin-label">Card Name</div><input class="admin-input" id="f${i}cardName" value="${esc(s.cardName)}"></div>
+    <div class="admin-field"><div class="admin-label">Card Short Description</div><input class="admin-input" id="f${i}cardDesc" value="${esc(s.cardDesc)}"></div>
+    <div class="admin-field admin-form-full">
+      <div class="admin-label">Card Image / Emoji</div>
+      <div class="media-toggle">
+        <div class="media-opt${!s.usePhoto?' active':''}" onclick="setMedia(${i},false,this)">🔤 Emoji</div>
+        <div class="media-opt${s.usePhoto?' active':''}" onclick="setMedia(${i},true,this)">🖼️ Photo</div>
+      </div>
+      <div id="f${i}emojiSec" style="${s.usePhoto?'display:none':''}"><input class="admin-input" id="f${i}emoji" value="${esc(s.emoji)}" style="font-size:20px;"></div>
+      <div id="f${i}photoSec" style="${!s.usePhoto?'display:none':''}">
+        <div class="photo-upload-area" onclick="document.getElementById('f${i}file').click()">
+          <img class="photo-preview${s.photoData?' show':''}" id="f${i}prev" src="${s.photoData||''}" alt="">
+          <div id="f${i}upico" style="${s.photoData?'display:none':''}"><div class="photo-upload-icon">📷</div><div class="photo-upload-text">Click to upload a photo</div><div class="photo-upload-hint">JPG, PNG — embedded in file</div></div>
+          <input type="file" id="f${i}file" accept="image/*" style="display:none;" onchange="handlePhoto(${i},this)">
+        </div>
+        <button class="photo-remove-btn${s.photoData?' show':''}" id="f${i}rmbtn" onclick="removePhoto(${i})">✕ Remove photo</button>
+      </div>
+    </div>
+    <div class="admin-field admin-form-full"><div class="admin-label">Scene / Location tag (on image)</div><input class="admin-input" id="f${i}scene" value="${esc(s.scene)}"></div>
+    <div class="admin-field admin-form-full"><div class="admin-label">Problem Title</div><input class="admin-input" id="f${i}title" value="${esc(s.title)}"></div>
+    <div class="admin-field admin-form-full"><div class="admin-label">📍 Location text</div><input class="admin-input" id="f${i}location" value="${esc(s.location)}"></div>
+    <div class="admin-field admin-form-full"><div class="admin-label">⚠️ Problem description</div><textarea class="admin-textarea" id="f${i}desc">${esc(s.desc)}</textarea></div>
+    <div class="admin-field admin-form-full"><div class="admin-label">📬 Recipient (full)</div><input class="admin-input" id="f${i}recipient" value="${esc(s.recipient)}"></div>
+    <div class="admin-field"><div class="admin-label">To: field hint</div><input class="admin-input" id="f${i}toHint" value="${esc(s.toHint)}"></div>
+    <div class="admin-field"><div class="admin-label">Subject: placeholder</div><input class="admin-input" id="f${i}subjectHint" value="${esc(s.subjectHint)}"></div>
+  </div>
+</div>`;
+    list.appendChild(item);
+  });
+}
+
+function toggleAI(i) { document.getElementById('ai_'+i).classList.toggle('open'); }
+
+function setMedia(i,usePhoto,btn) {
+  btn.closest('.media-toggle').querySelectorAll('.media-opt').forEach(o=>o.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('f'+i+'emojiSec').style.display=usePhoto?'none':'';
+  document.getElementById('f'+i+'photoSec').style.display=usePhoto?'':'none';
+}
+
+function handlePhoto(i,input) {
+  const file=input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const d=e.target.result;
+    const prev=document.getElementById('f'+i+'prev');
+    prev.src=d; prev.classList.add('show'); prev.dataset.newPhoto=d;
+    document.getElementById('f'+i+'upico').style.display='none';
+    document.getElementById('f'+i+'rmbtn').classList.add('show');
+  };
+  reader.readAsDataURL(file);
+}
+
+function removePhoto(i) {
+  const prev=document.getElementById('f'+i+'prev');
+  prev.src=''; prev.classList.remove('show'); delete prev.dataset.newPhoto;
+  document.getElementById('f'+i+'upico').style.display='';
+  document.getElementById('f'+i+'rmbtn').classList.remove('show');
+}
+
+function renderAdminPhrases() {
+  const list=document.getElementById('phrasesAdminList'); list.innerHTML='';
+  phrases.forEach((p,i)=>{
+    const row=document.createElement('div'); row.className='phrase-admin-row';
+    row.innerHTML=`<span style="font-size:13px;color:var(--grey-mid);font-weight:600;min-width:18px;">${i+1}</span><input class="phrase-admin-input" value="${esc(p)}" placeholder="Type a phrase…"><button class="phrase-del-btn" onclick="this.closest('.phrase-admin-row').remove()">✕</button>`;
+    list.appendChild(row);
+  });
+}
+
+function addAdminPhrase() {
+  const list=document.getElementById('phrasesAdminList');
+  const num=list.querySelectorAll('.phrase-admin-row').length+1;
+  const row=document.createElement('div'); row.className='phrase-admin-row';
+  row.innerHTML=`<span style="font-size:13px;color:var(--grey-mid);font-weight:600;min-width:18px;">${num}</span><input class="phrase-admin-input" placeholder="Type a new phrase…"><button class="phrase-del-btn" onclick="this.closest('.phrase-admin-row').remove()">✕</button>`;
+  list.appendChild(row);
+  row.querySelector('input').focus();
+}
+
+function saveAdminChanges() {
+  data.forEach((s,i)=>{
+    const body=document.querySelector('#ai_'+i+' .admin-scenario-body'); if(!body) return;
+    const activeOpt=body.querySelector('.media-opt.active');
+    s.usePhoto = !!(activeOpt && activeOpt.textContent.includes('Photo'));
+    s.cardName      = document.getElementById('f'+i+'cardName').value;
+    s.cardDesc      = document.getElementById('f'+i+'cardDesc').value;
+    s.emoji         = document.getElementById('f'+i+'emoji').value;
+    s.scene         = document.getElementById('f'+i+'scene').value;
+    s.title         = document.getElementById('f'+i+'title').value;
+    s.location      = document.getElementById('f'+i+'location').value;
+    s.desc          = document.getElementById('f'+i+'desc').value;
+    s.recipient     = document.getElementById('f'+i+'recipient').value;
+    s.toHint        = document.getElementById('f'+i+'toHint').value;
+    s.subjectHint   = document.getElementById('f'+i+'subjectHint').value;
+    const prev=document.getElementById('f'+i+'prev');
+    if (prev.dataset.newPhoto) s.photoData=prev.dataset.newPhoto;
+    else if (!prev.classList.contains('show')) s.photoData=null;
+  });
+  phrases = Array.from(document.querySelectorAll('#phrasesAdminList .phrase-admin-input')).map(inp=>inp.value.trim()).filter(Boolean);
+  persist();
+  renderScenarioGrid(); renderPhrasesList();
+  const st=document.getElementById('adminSaveStatus');
+  st.textContent='✓ Saved!'; st.classList.add('show');
+  setTimeout(()=>st.classList.remove('show'),2500);
+}
+
+function resetToDefaults() {
+  if(!confirm('Reset everything to the original defaults? This cannot be undone.')) return;
+  data=JSON.parse(JSON.stringify(DEFAULT_DATA)); phrases=[...DEFAULT_PHRASES];
+  persist(); renderScenarioGrid(); renderPhrasesList(); renderAdminScenarios(); renderAdminPhrases();
+  const st=document.getElementById('adminSaveStatus');
+  st.textContent='↺ Reset!'; st.classList.add('show');
+  setTimeout(()=>{st.classList.remove('show');st.textContent='✓ Saved!';},2000);
+}
+
+function esc(str) { return str?String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):''; }
+
+
+/* ── Submit via EmailJS REST API ── */
+const EJS_SERVICE  = 'service_2cc64th';
+const EJS_TEMPLATE = 'template_a3bxd2o';
+const EJS_KEY      = 'oAKvhL3QIzn6v0fIZNySI';
+
+async function submitEmail() {
+  const name    = document.querySelector('.meta-input[placeholder="your name"]').value.trim();
+  const cls     = document.querySelector('.meta-input[placeholder="class"]').value.trim();
+  const date    = document.querySelector('.meta-input[placeholder="date"]').value.trim();
+  const to      = document.getElementById('fieldTo').value.trim();
+  const subject = document.getElementById('fieldSubject').value.trim();
+  const body    = document.getElementById('bodyText').value.trim();
+
+  if (!name) { showStatus('error', '⚠ Please enter your name first.'); return; }
+  if (!body) { showStatus('error', '⚠ Your email body is empty.'); return; }
+
+  const activeCard = document.querySelector('.scenario-card.active .scenario-card-name');
+  const scenario = activeCard ? activeCard.textContent : '(no scenario selected)';
+
+  const btn = document.getElementById('submitBtn');
+  document.getElementById('submitBtnText').textContent = '⏳ Sending…';
+  btn.disabled = true;
+  showStatus('sending', 'Sending your email…');
+
+  const message = `Student: ${name}
+Class: ${cls || '(no class)'}
+Date: ${date || '(no date)'}
+Scenario: ${scenario}
+
+--- TO ---
+${to || '(not filled)'}
+
+--- SUBJECT ---
+${subject || '(not filled)'}
+
+--- EMAIL BODY ---
+${body}`;
+
+  try {
+    const res = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        service_id:  EJS_SERVICE,
+        template_id: EJS_TEMPLATE,
+        user_id:     EJS_KEY,
+        template_params: {
+          student_name:  name,
+          student_class: cls  || '(no class)',
+          student_date:  date || '(no date)',
+          scenario,
+          email_to:      to      || '(not filled)',
+          email_subject: subject || '(not filled)',
+          email_body:    body,
+          message
+        }
+      })
+    });
+
+    if (res.ok) {
+      showStatus('success', '✓ Submitted successfully!');
+      document.getElementById('submitBtnText').textContent = '✓ Submitted';
+      btn.style.background = '#10b981';
+    } else {
+      const txt = await res.text();
+      console.error('EmailJS error:', res.status, txt);
+      showStatus('error', '✗ Failed to send. Please try again.');
+      document.getElementById('submitBtnText').textContent = '📤 Submit Email';
+      btn.disabled = false;
+    }
+  } catch(err) {
+    console.error('EmailJS fetch error:', err);
+    showStatus('error', '✗ Network error. Check your connection.');
+    document.getElementById('submitBtnText').textContent = '📤 Submit Email';
+    btn.disabled = false;
+  }
+}
+
+function showStatus(type, msg) {
+  const el = document.getElementById('submitStatus');
+  el.className = 'submit-status ' + type;
+  el.textContent = msg;
+}
+
+document.getElementById('adminOverlay').addEventListener('click',function(e){if(e.target===this)closeAdmin();});
+
+renderScenarioGrid();
+renderPhrasesList();
+</script>
+</body>
+</html>
